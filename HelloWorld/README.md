@@ -28,6 +28,7 @@ docker run -it -p 8080:8080 --name registry-web --link registry-srv -e REGISTRY_
 kubectl create clusterrolebinding cluster-admin-binding \
 --clusterrole=cluster-admin \
 --user=$(gcloud config get-value core/account)
+```
 
 ## Install Tekton Pipelines
 See https://github.com/tektoncd/pipeline/blob/master/docs/install.md#pre-requisites
