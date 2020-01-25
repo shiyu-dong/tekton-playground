@@ -23,6 +23,19 @@ docker run -d -p 5000:5000 --name registry-srv -e REGISTRY_STORAGE_DELETE_ENABLE
 docker run -it -p 8080:8080 --name registry-web --link registry-srv -e REGISTRY_URL=http://registry-srv:5000/v2 -e REGISTRY_NAME=localhost:5000 hyper/docker-registry-web
 ```
 
+## Set up kubernetes
+```
+kubectl create clusterrolebinding cluster-admin-binding \
+--clusterrole=cluster-admin \
+--user=$(gcloud config get-value core/account)
+
+## Install Tekton Pipelines
+See https://github.com/tektoncd/pipeline/blob/master/docs/install.md#pre-requisites
+```
+kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+kubectl get pods --namespace tekton-pipelines
+```
+
 ## Setting credentials
 ```
 kubectl create secret docker-registry regcred \
