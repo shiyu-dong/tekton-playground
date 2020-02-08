@@ -1,0 +1,132 @@
+---
+# git resource
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: git-clone
+spec:
+  type: git
+  params:
+    - name: revision
+      value: master
+    - name: url
+      value: https://github.com/shiyu-dong/tekton-playground
+
+---
+# Child task1 definition
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: task1
+spec:
+  inputs:
+    resources:
+      - name: repo
+        type: git
+    params:
+      - name: service-name
+        type: string
+  steps:
+    - image: ubuntu  # contains bash
+      script: |
+        #!/usr/bin/env bash
+        echo "echo task1 from shell for service "$(inputs.params.service-name)""
+        PROJECT="$(inputs.params.service-name)" ./repo/Web/task1.sh
+---
+# Child task2 definition
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: task2
+spec:
+  inputs:
+    resources:
+      - name: repo
+        type: git
+    params:
+      - name: service-name
+        type: string
+  steps:
+    - image: ubuntu  # contains bash
+      script: |
+        #!/usr/bin/env bash
+        echo "echo task2 from shell for service "$(inputs.params.service-name)""
+        PROJECT="$(inputs.params.service-name)" ./repo/Web/task2.sh
+---
+# Child pipeline definition
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: child-pipeline
+spec:
+  resources:
+    - name: source-repo
+      type: git
+  params:
+    - name: service-name
+      type: string
+      description: service name for child tasks
+      default: unspecified-service
+  tasks:
+    - name: task1
+      taskRef:
+        name: task1
+      params:
+        - name: service-name
+          value: "$(params.service-name)"
+      resources:
+        inputs:
+          - name: repo
+            resource: source-repo
+    - name: task2
+      taskRef:
+        name: task2
+      params:
+        - name: service-name
+          value: "$(params.service-name)"
+      resources:
+        inputs:
+          - name: repo
+            resource: source-repo
+---
+# Child task run
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: run-task1
+spec:
+  taskRef:
+    name: task1
+---
+  # Child pipeline run
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: child-pipeline-run12
+spec:
+  pipelineRef:
+    name: child-pipeline
+  resources:
+    - name: source-repo
+      resourceRef:
+        name: git-clone
+  params:
+    - name: "service-name"
+      value: "test-service"
+
+# Child task run
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: task1-taskrun3
+spec:
+  taskRef:
+    name: task1
+  inputs:
+    params:
+      - name: service-name
+        value: manual-task-run-service
+    resources:
+      - name: repo
+        resourceRef:
+          name: git-clone
