@@ -1,1 +1,1 @@
-echo "running tasks1 for project $PROJECT after git clone
+echo "running tasks1 for project $PROJECT after git clone"

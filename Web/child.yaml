@@ -102,7 +102,7 @@ spec:
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineRun
 metadata:
-  name: child-pipeline-run12
+  name: child-pipeline-run1
 spec:
   pipelineRef:
     name: child-pipeline
@@ -114,19 +114,19 @@ spec:
     - name: "service-name"
       value: "test-service"
 
-# Child task run
-apiVersion: tekton.dev/v1alpha1
-kind: TaskRun
-metadata:
-  name: task1-taskrun3
-spec:
-  taskRef:
-    name: task1
-  inputs:
-    params:
-      - name: service-name
-        value: manual-task-run-service
-    resources:
-      - name: repo
-        resourceRef:
-          name: git-clone
+# # Child task run
+# apiVersion: tekton.dev/v1alpha1
+# kind: TaskRun
+# metadata:
+#   name: task1-taskrun3
+# spec:
+#   taskRef:
+#     name: task1
+#   inputs:
+#     params:
+#       - name: service-name
+#         value: manual-task-run-service
+#     resources:
+#       - name: repo
+#         resourceRef:
+#           name: git-clone
